@@ -78,6 +78,7 @@ jobs:
       - name: 'Build and Push Container'
         run: |-
           DOCKER_TAG="$${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REGISTRY_NAME }}:${{ github.sha }}"
+          echo "Using DOCKER_TAG: ${DOCKER_TAG}"  # Print the tag to debug formatting
           docker build --tag "${DOCKER_TAG}" .
           docker push "${DOCKER_TAG}"
       - name: 'Deploy to Cloud Run'
