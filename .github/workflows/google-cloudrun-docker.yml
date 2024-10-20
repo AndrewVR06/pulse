@@ -41,7 +41,7 @@ env:
   REGION: 'europe-west2 ' # TODO: update to your region
   SERVICE: 'ingest-pipeline' # TODO: update to your service name
   DOCKER_REGISTRY_NAME: 'pulse'
-  WORKLOAD_IDENTITY_PROVIDER: 'https://iam.googleapis.com/projects/594993328978/locations/global/workloadIdentityPools/github/providers/github-actions' # TODO: update to your workload identity provider
+  WORKLOAD_IDENTITY_PROVIDER: 'projects/594993328978/locations/global/workloadIdentityPools/github/providers/github-actions' # TODO: update to your workload identity provider
 
 jobs:
   deploy:
