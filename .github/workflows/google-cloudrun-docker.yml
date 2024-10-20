@@ -80,6 +80,7 @@ jobs:
         run: |-
           DOCKER_TAG="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REGISTRY_NAME }}:${{ github.sha }}"
           docker build --tag "${DOCKER_TAG}" .
+          gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://${{ env.REGION }}-docker.pkg.dev
           docker push "${DOCKER_TAG}"
       - name: 'Deploy to Cloud Run'
 
