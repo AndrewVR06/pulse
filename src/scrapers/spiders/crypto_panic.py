@@ -74,7 +74,7 @@ class CryptoPanic(scrapy.Spider):
                 },
                 callback=self.parse_crypto_panic_url,
             )
-            for rep in parsed_response.results[:5]
+            for rep in parsed_response.results
         )
 
     def parse_crypto_panic_url(self, response: TextResponse) -> None:
