@@ -32,7 +32,7 @@ name: 'Build and Deploy to Cloud Run'
 on:
   push:
     branches:
-      - '"main"'
+      - main
   # Manual trigger
   workflow_dispatch:
 
@@ -41,8 +41,8 @@ env:
   REGION: 'europe-west2' # TODO: update to your region
   SERVICE: 'ingest-pipeline' # TODO: update to your service name
   DOCKER_REGISTRY_NAME: 'pulse'
-  WORKLOAD_IDENTITY_PROVIDER: 'projects/594993328978/locations/global/workloadIdentityPools/github/providers/github-actions' # TODO: update to your workload identity provider
-  SERVICE_ACCOUNT_EMAIL: 'github-action@pulse-439215.iam.gserviceaccount.com'
+  WORKLOAD_IDENTITY_PROVIDER: 'projects/594993328978/locations/global/workloadIdentityPools/github-actions/providers/pulse-repo' # TODO: update to your workload identity provider
+  SERVICE_ACCOUNT_EMAIL: 'github-actions@pulse-439215.iam.gserviceaccount.com'
 jobs:
   deploy:
     runs-on: 'ubuntu-latest'
@@ -63,9 +63,9 @@ jobs:
         name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@f112390a2df9932162083945e46d439060d66ec2' # google-github-actions/auth@v2
         with:
-          token_format: access_token
-          workload_identity_provider: '${{ env.WORKLOAD_IDENTITY_PROVIDER }}'
           service_account: '${{ env.SERVICE_ACCOUNT_EMAIL }}'
+          workload_identity_provider: '${{ env.WORKLOAD_IDENTITY_PROVIDER }}'
+
 
       # BEGIN - Docker auth and build
       #
