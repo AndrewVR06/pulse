@@ -37,9 +37,9 @@ on:
   workflow_dispatch:
 
 env:
-  PROJECT_ID: 'pulse-439215' # TODO: update to your Google Cloud project ID
-  REGION: 'europe-west2' # TODO: update to your region
-  SERVICE: 'ingest-pipeline' # TODO: update to your service name
+  PROJECT_ID: 'pulse-439215' 
+  REGION: 'europe-west2' 
+  SERVICE: 'ingest-pipeline' 
   DOCKER_REGISTRY_NAME: 'pulse'
   WORKLOAD_IDENTITY_PROVIDER: 'projects/594993328978/locations/global/workloadIdentityPools/github-actions/providers/pulse-repo' # TODO: update to your workload identity provider
   SERVICE_ACCOUNT_EMAIL: 'github-actions@pulse-439215.iam.gserviceaccount.com'
@@ -50,7 +50,6 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
-      packages: 'write'
 
     steps:
       - name: 'Checkout'
@@ -91,7 +90,7 @@ jobs:
           region: '${{ env.REGION }}'
           # NOTE: If using a pre-built image, update the image name below:
 
-          image: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REGISTRY_NAME }}:${{ github.sha }}'
+          image: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REGISTRY_NAME }}/${{ env.SERVICE }}:${{ github.sha }}'
       # If required, use the Cloud Run URL output in later steps
       - name: 'Show output'
         run: |2-
