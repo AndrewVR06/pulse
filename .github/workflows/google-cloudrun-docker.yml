@@ -82,7 +82,7 @@ jobs:
         uses: 'docker/build-push-action@v6'
         with:
           push: true
-          tags: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REGISTRY_NAME }}:${{ github.sha }}'
+          tags: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REGISTRY_NAME }}/${{ env.SERVICE }}:${{ github.sha }}'
       
       - name: 'Deploy to Cloud Run'
         uses: 'google-github-actions/deploy-cloudrun@33553064113a37d688aa6937bacbdc481580be17' # google-github-actions/deploy-cloudrun@v2
