@@ -67,34 +67,41 @@ jobs:
           service_account: '${{ env.SERVICE_ACCOUNT_EMAIL }}'
           workload_identity_provider: '${{ env.WORKLOAD_IDENTITY_PROVIDER }}'
 
+      - name: 'Check Active GCP Account'
+        run: |
+          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS"
+          gcloud auth list
 
-      # BEGIN - Docker auth and build
-      #
-      # If you already have a container image, you can omit these steps.
-      - name: 'Docker Auth'
-        uses: 'docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567' # docker/login-action@v3
-        with:
-          username: 'oauth2accesstoken'
-          password: '${{ steps.auth.outputs.auth_token }}'
-          registry: '${{ env.REGION }}-docker.pkg.dev'
-
-      - name: Build and Push Container
-        run: |-
-          echo "$GOOGLE_CREDENTIALS" > ./google-credentials.json && gcloud auth login --brief --cred-file=./google-credentials.json --update-adc
-          gcloud auth configure-docker --quiet
-          docker build -t "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REGISTRY_NAME }}/${{ env.SERVICE }}:${{ github.sha }}" ./
-          docker push "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REGISTRY_NAME }}/${{ env.SERVICE }}:${{ github.sha }}"
-      
-      - name: 'Deploy to Cloud Run'
-        uses: 'google-github-actions/deploy-cloudrun@33553064113a37d688aa6937bacbdc481580be17' # google-github-actions/deploy-cloudrun@v2
-        with:
-          service: '${{ env.SERVICE }}'
-          region: '${{ env.REGION }}'
-          # NOTE: If using a pre-built image, update the image name below:
-
-          image: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REGISTRY_NAME }}/${{ env.SERVICE }}:${{ github.sha }}'
-      # If required, use the Cloud Run URL output in later steps
-      - name: 'Show output'
-        run: |2-
-
-          echo ${{ steps.deploy.outputs.url }}
+      - name: 'Does AUTH continue?'
+        run: |
+          gcloud auth list
+#      # BEGIN - Docker auth and build
+#      #
+#      # If you already have a container image, you can omit these steps.
+#      - name: 'Docker Auth'
+#        uses: 'docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567' # docker/login-action@v3
+#        with:
+#          username: 'oauth2accesstoken'
+#          password: '${{ steps.auth.outputs.auth_token }}'
+#          registry: '${{ env.REGION }}-docker.pkg.dev'
+#
+#      - name: Build and Push Container
+#        run: |-
+#          echo "$GOOGLE_CREDENTIALS" > ./google-credentials.json && gcloud auth login --brief --cred-file=./google-credentials.json --update-adc
+#          gcloud auth configure-docker --quiet
+#          docker build -t "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REGISTRY_NAME }}/${{ env.SERVICE }}:${{ github.sha }}" ./
+#          docker push "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REGISTRY_NAME }}/${{ env.SERVICE }}:${{ github.sha }}"
+#
+#      - name: 'Deploy to Cloud Run'
+#        uses: 'google-github-actions/deploy-cloudrun@33553064113a37d688aa6937bacbdc481580be17' # google-github-actions/deploy-cloudrun@v2
+#        with:
+#          service: '${{ env.SERVICE }}'
+#          region: '${{ env.REGION }}'
+#          # NOTE: If using a pre-built image, update the image name below:
+#
+#          image: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REGISTRY_NAME }}/${{ env.SERVICE }}:${{ github.sha }}'
+#      # If required, use the Cloud Run URL output in later steps
+#      - name: 'Show output'
+#        run: |2-
+#
+#          echo ${{ steps.deploy.outputs.url }}
