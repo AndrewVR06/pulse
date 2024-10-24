@@ -41,7 +41,7 @@ env:
   REGION: 'europe-west2' 
   SERVICE: 'ingest-pipeline' 
   DOCKER_REGISTRY_NAME: 'pulse'
-  WORKLOAD_IDENTITY_PROVIDER: 'projects/594993328978/locations/global/workloadIdentityPools/github-actions/providers/pulse-repo' # TODO: update to your workload identity provider
+  WORKLOAD_IDENTITY_PROVIDER: 'projects/594993328978/locations/global/workloadIdentityPools/github-actions/providers/pulse-repo'
   SERVICE_ACCOUNT_EMAIL: 'github-actions@pulse-439215.iam.gserviceaccount.com'
 jobs:
   deploy:
@@ -80,6 +80,8 @@ jobs:
 
       - name: Build and Push Container
         run: |-
+          echo "$GOOGLE_CREDENTIALS" > ./google-credentials.json && gcloud auth login --brief --cred-file=./google-credentials.json --update-adc
+          gcloud auth configure-docker --quiet
           docker build -t "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REGISTRY_NAME }}/${{ env.SERVICE }}:${{ github.sha }}" ./
           docker push "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REGISTRY_NAME }}/${{ env.SERVICE }}:${{ github.sha }}"
       
