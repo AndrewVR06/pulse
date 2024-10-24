@@ -69,7 +69,8 @@ jobs:
 
       - name: 'Check Active GCP Account'
         run: |
-          gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS"
+          printf "$GOOGLE_APPLICATION_CREDENTIALS" | base64 -d > /tmp/creds.json
+          gcloud auth activate-service-account --key-file=/tmp/creds.json
           gcloud auth list
 
       - name: 'Does AUTH continue?'
