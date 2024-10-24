@@ -66,16 +66,15 @@ jobs:
           token_format: 'access_token'
           service_account: '${{ env.SERVICE_ACCOUNT_EMAIL }}'
           workload_identity_provider: '${{ env.WORKLOAD_IDENTITY_PROVIDER }}'
+          create_credentials_file: true
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
 
       - name: 'Check Active GCP Account'
         run: |
-          printf "$GOOGLE_APPLICATION_CREDENTIALS" | base64 -d > /tmp/creds.json
-          gcloud auth activate-service-account --key-file=/tmp/creds.json
           gcloud auth list
 
-      - name: 'Does AUTH continue?'
-        run: |
-          gcloud auth list
 #      # BEGIN - Docker auth and build
 #      #
 #      # If you already have a container image, you can omit these steps.
