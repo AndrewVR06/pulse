@@ -77,6 +77,11 @@ jobs:
           password: '${{ steps.auth.outputs.auth_token }}'
           registry: '${{ env.REGION }}-docker.pkg.dev'
 
+      - name: 'Debug Authentication'
+        run: |
+          gcloud auth list
+          gcloud config list
+          
       - name: 'Build and Push Container'
         uses: 'docker/build-push-action@v6'
         with:
