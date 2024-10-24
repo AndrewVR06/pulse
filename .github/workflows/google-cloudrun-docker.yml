@@ -57,6 +57,8 @@ jobs:
           service: ${{ env.SERVICE }}
           region: ${{ env.REGION }}
           image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REGISTRY_NAME }}/${{ env.SERVICE }}:${{ github.sha }}
+          ingress: all
+          flags: --allow-unauthenticated
           # NOTE: You can also set env variables here:
           #  env_vars: |
           #  NODE_ENV=production

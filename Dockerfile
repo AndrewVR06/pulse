@@ -29,8 +29,6 @@ COPY src /backend
 
 ENV PYTHONPATH="/backend"
 
-# Make port 8000 available to the world outside this container
 EXPOSE 8080
 
-# Run Django migrations and then start the Django app
-CMD ["poetry", "run", "fastapi", "run", "src/main.py", "--port", "8080"]
+CMD ["poetry", "run", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]
