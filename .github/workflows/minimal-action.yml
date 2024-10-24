@@ -1,0 +1,33 @@
+name: 'Test Authentication'
+
+on:
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: 'pulse-439215'
+  REGION: 'europe-west2'
+  SERVICE: 'ingest-pipeline'
+  DOCKER_REGISTRY_NAME: 'pulse'
+  WORKLOAD_IDENTITY_PROVIDER: 'projects/594993328978/locations/global/workloadIdentityPools/github-actions/providers/pulse-repo' # TODO: update to your workload identity provider
+  SERVICE_ACCOUNT_EMAIL: 'github-actions@pulse-439215.iam.gserviceaccount.com'
+jobs:
+  test:
+    runs-on: 'ubuntu-latest'
+
+    permissions:
+      id-token: 'write'
+      contents: 'read'
+
+    steps:
+      - name: 'Checkout'
+        uses: 'actions/checkout@v4'
+
+      - name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          service_account: '${{ env.SERVICE_ACCOUNT_EMAIL }}'
+          workload_identity_provider: '${{ env.WORKLOAD_IDENTITY_PROVIDER }}'
+
+      - name: 'List Artifact Repositories'
+        run: |
+          gcloud artifacts repositories list --location=${{ env.REGION }}
