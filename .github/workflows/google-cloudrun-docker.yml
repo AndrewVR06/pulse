@@ -81,19 +81,10 @@ jobs:
           password: '${{ steps.auth.outputs.auth_token }}'
           registry: '${{ env.REGION }}-docker.pkg.dev'
 
-      - name: 'Test Docker Authentication'
-        run: |
-          docker image ls "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/pulse"
-
-      # OR more precisely using gcloud (since you're already authenticated):
-      - name: 'Test GCP Docker Authentication'
-        run: |
-          gcloud artifacts docker images list "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/pulse"
-#
-#      - name: Build and Push Container
-#        run: |-
-#          docker build -t "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REGISTRY_NAME }}/${{ env.SERVICE }}:${{ github.sha }}" ./
-#          docker push "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REGISTRY_NAME }}/${{ env.SERVICE }}:${{ github.sha }}"
+      - name: Build and Push Container
+        run: |-
+          docker build -t "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REGISTRY_NAME }}/${{ env.SERVICE }}:${{ github.sha }}" ./
+          docker push "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_REGISTRY_NAME }}/${{ env.SERVICE }}:${{ github.sha }}"
 #
 #      - name: 'Deploy to Cloud Run'
 #        uses: 'google-github-actions/deploy-cloudrun@33553064113a37d688aa6937bacbdc481580be17' # google-github-actions/deploy-cloudrun@v2
