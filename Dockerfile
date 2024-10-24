@@ -33,4 +33,4 @@ ENV PYTHONPATH="/backend"
 EXPOSE 8080
 
 # Run Django migrations and then start the Django app
-CMD ["fastapi", "run", "src/main.py", "--port", "8080"]
+CMD ["poetry", "run", "fastapi", "run", "src/main.py", "--port", "8080"]
