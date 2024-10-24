@@ -83,7 +83,7 @@ jobs:
 
       - name: 'Test Docker Authentication'
         run: |
-          docker images ls "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/pulse"
+          docker image ls "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/pulse"
 
       # OR more precisely using gcloud (since you're already authenticated):
       - name: 'Test GCP Docker Authentication'
