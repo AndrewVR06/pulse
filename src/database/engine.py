@@ -1,5 +1,7 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
+from config import get_settings
+
 
 class DatabaseEngine:
     _instance = None
@@ -11,5 +13,5 @@ class DatabaseEngine:
         return cls._instance
 
     def _init_connection(self):
-        engine = create_async_engine("postgresql+asyncpg://postgres:password@localhost:5433/pulse")
+        engine = create_async_engine(get_settings().DATABASE_URL, connect_args={"ssl": get_settings().ssl_database_context})
         self.session_maker = async_sessionmaker(engine)

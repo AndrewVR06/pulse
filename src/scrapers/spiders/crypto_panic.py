@@ -60,7 +60,6 @@ class CryptoPanic(scrapy.Spider):
         :return:
         """
         parsed_response = CryptoPanicApiResponse.model_validate(response.json())
-        print(len(parsed_response.results))
 
         yield from (
             scrapy.Request(

@@ -3,9 +3,10 @@ from logging.config import fileConfig
 
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
-from sqlalchemy.ext.asyncio import async_engine_from_config
+from sqlalchemy.ext.asyncio import create_async_engine
 from alembic import context
 
+from config import get_settings
 from database.base import Base
 
 # this is the Alembic Config object, which provides
@@ -33,13 +34,8 @@ async def run_async_migrations() -> None:
     and associate a connection with the context.
 
     """
-
-    connectable = async_engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
-
+    settings = get_settings()
+    connectable = create_async_engine(settings.DATABASE_URL, connect_args={"ssl": settings.ssl_database_context})
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)
 
