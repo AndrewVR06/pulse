@@ -22,6 +22,10 @@ ENV PYTHONUNBUFFERED 1
 # Set the working directory in the container
 WORKDIR /backend
 
+COPY src/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+
 COPY poetry.lock pyproject.toml .
 RUN poetry install --without dev
 
@@ -31,4 +35,4 @@ ENV PYTHONPATH="/backend"
 
 EXPOSE 8080
 
-CMD ["poetry", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["/entrypoint.sh"]

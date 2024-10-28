@@ -7,4 +7,15 @@ __pycache__/
 *.pyo
 *.pyd
 
+# Ignore key files
+*.pem
+
+# Env files
+.env
+
+# my script file
+src/pastebin.py
+
+
+
 
