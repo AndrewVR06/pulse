@@ -21,7 +21,13 @@ class AppSettings(BaseSettings):
     PGSSLCERT_CONTENT: str | None = None
     PGSSLKEY_CONTENT: str | None = None
 
-    model_config = SettingsConfigDict(env_file=".env")
+    # Anthropic API Key
+    ANTHROPIC_API_KEY: str
+    PINECONE_API_KEY: str
+    VOYAGEAI_API_KEY: str
+    CRYPTO_PANIC_API_KEY: str
+
+    model_config = SettingsConfigDict(env_file="/Users/andrewvanrensburg/workspace/pulse/src/.env")
 
     @property
     def DATABASE_URL(self) -> str:

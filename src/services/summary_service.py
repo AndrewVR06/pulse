@@ -1,8 +1,8 @@
-import asyncio
 import re
 
 import anthropic
-from anthropic.types.beta.prompt_caching import PromptCachingBetaMessage
+
+from config import get_settings
 
 
 class SummaryService:
@@ -11,9 +11,7 @@ class SummaryService:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(SummaryService, cls).__new__(cls)
-            cls._instance.client = anthropic.AsyncAnthropic(
-                api_key="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"
-            )
+            cls._instance.client = anthropic.AsyncAnthropic(api_key=get_settings().ANTHROPIC_API_KEY)
         return cls._instance
 
     async def isolate_article_text(self, article_text: str) -> str:

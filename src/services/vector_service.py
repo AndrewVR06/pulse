@@ -1,6 +1,7 @@
 from pinecone.grpc import PineconeGRPC as Pinecone
 import voyageai
 
+from config import get_settings
 from schemas.document import Document
 
 
@@ -11,9 +12,9 @@ class VectorService:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(VectorService, cls).__new__(cls)
-            cls._instance._pinecone_client = Pinecone(api_key="f05d6441-ddb8-4fce-9aa9-e81f13f737fd")
-            cls._instance._index = cls._instance._pinecone_client.Index("voyage-finance-local")
-            cls._instance._embedder = voyageai.AsyncClient(api_key="pa-e5I1i7S2xGswwAyvOk7rgzgnF0L-laseEl4wwk0hN0c")
+            cls._instance._pinecone_client = Pinecone(api_key=get_settings().PINECONE_API_KEY)
+            cls._instance._index = cls._instance._pinecone_client.Index("voyage-finance-production")
+            cls._instance._embedder = voyageai.AsyncClient(api_key=get_settings().VOYAGEAI_API_KEY)
         return cls._instance
 
     async def store_document(self, document: Document) -> None:

@@ -6,6 +6,7 @@ from scrapy import Request
 from scrapy.http import TextResponse
 from scrapy_playwright.page import PageMethod
 
+from config import get_settings
 from scrapers.schemas.crypto_panic_api_schema import CryptoPanicApiResponse
 from scrapers.schemas.database_pipeline_input_schema import DatabasePipelineInputSchema
 
@@ -50,7 +51,7 @@ class CryptoPanic(scrapy.Spider):
         Use the crypto panic API to get the list of URLs to visit. Each URL is a reference to a crypto panic site. We
         will need to navigate through there to get the sites of interest.
         """
-        api = "https://cryptopanic.com/api/v1/posts/?auth_token=85381f8e0faf10d571706be1244a5d0179630cb8&public=true&kind=news&page=1"
+        api = f"https://cryptopanic.com/api/v1/posts/?auth_token={get_settings().CRYPTO_PANIC_API_KEY}&public=true&kind=news&page=1"
         yield scrapy.Request(url=api, callback=self.parse_api_response)
 
     def parse_api_response(self, response: TextResponse) -> None:
@@ -67,13 +68,13 @@ class CryptoPanic(scrapy.Spider):
                 meta={
                     "playwright": True,
                     "playwright_page_methods": [
-                        PageMethod("wait_for_selector", selector=".news-detail", state="visible", timeout=3000),
+                        PageMethod("wait_for_selector", selector=".post-header", state="visible", timeout=5000),
                     ],
                     "cryptopanic_response": rep,
                 },
                 callback=self.parse_crypto_panic_url,
             )
-            for rep in parsed_response.results
+            for rep in parsed_response.results[:1]
         )
 
     def parse_crypto_panic_url(self, response: TextResponse) -> None:
