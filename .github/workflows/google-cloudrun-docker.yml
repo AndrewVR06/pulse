@@ -67,15 +67,15 @@ jobs:
             PGSSLROOTCERT_CONTENT=projects/${{ env.PROJECT_NUMBER }}/secrets/PULSE_DB_SERVER_CA
             PGSSLCERT_CONTENT=projects/${{ env.PROJECT_NUMBER }}/secrets/PULSE_DB_CLIENT_CERT
             PGSSLKEY_CONTENT=projects/${{ env.PROJECT_NUMBER }}/secrets/PULSE_DB_CLIENT_KEY
+            ANTHROPIC_API_KEY=projects/${{ env.PROJECT_NUMBER }}/secrets/ANTHROPIC_API_KEY
+            PINECONE_API_KEY=projects/${{ env.PROJECT_NUMBER }}/secrets/PINECONE_API_KEY
+            VOYAGEAI_API_KEY=projects/${{ env.PROJECT_NUMBER }}/secrets/VOYAGEAI_API_KEY
+            CRYPTO_PANIC_API_KEY=projects/${{ env.PROJECT_NUMBER }}/secrets/CRYPTO_PANIC_API_KEY
           env_vars: |
             ENVIRONMENT=production
             POSTGRES_USER=postgres
             POSTGRES_HOST=10.68.80.3
             POSTGRES_DB=pulse
-          # NOTE: You can also set env variables here:
-          #  env_vars: |
-          #  NODE_ENV=production
-          #  TOKEN_EXPIRE=6400
 
       # If required, use the Cloud Run url output in later steps
       - name: Show Output

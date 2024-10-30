@@ -29,6 +29,9 @@ RUN chmod +x /entrypoint.sh
 COPY poetry.lock pyproject.toml .
 RUN poetry install --without dev
 
+# Install only Chromium browser with dependencies
+RUN poetry run playwright install --with-deps chromium
+
 COPY src /backend
 
 ENV PYTHONPATH="/backend"
