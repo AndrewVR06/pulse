@@ -1,7 +1,7 @@
 from pinecone.grpc import PineconeGRPC as Pinecone
 import voyageai
 
-from config import get_settings
+from app_config import get_settings
 from schemas.document import Document
 
 

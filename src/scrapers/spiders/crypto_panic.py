@@ -6,7 +6,7 @@ from scrapy import Request
 from scrapy.http import TextResponse
 from scrapy_playwright.page import PageMethod
 
-from config import get_settings
+from app_config import get_settings
 from scrapers.schemas.crypto_panic_api_schema import CryptoPanicApiResponse
 from scrapers.schemas.database_pipeline_input_schema import DatabasePipelineInputSchema
 

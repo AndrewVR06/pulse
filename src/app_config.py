@@ -1,7 +1,12 @@
 import os
 import ssl
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
+
+SRC_DIR = Path(__file__).parent
+ENV_FILE = SRC_DIR / ".env"
 
 
 class AppSettings(BaseSettings):
@@ -21,13 +26,13 @@ class AppSettings(BaseSettings):
     PGSSLCERT_CONTENT: str | None = None
     PGSSLKEY_CONTENT: str | None = None
 
-    # Anthropic API Key
+    # API Keys
     ANTHROPIC_API_KEY: str
     PINECONE_API_KEY: str
     VOYAGEAI_API_KEY: str
     CRYPTO_PANIC_API_KEY: str
 
-    model_config = SettingsConfigDict(env_file="/Users/andrewvanrensburg/workspace/pulse/src/.env")
+    model_config = SettingsConfigDict(env_file=str(ENV_FILE), extra="ignore")
 
     @property
     def DATABASE_URL(self) -> str:

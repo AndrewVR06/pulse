@@ -1,24 +1,24 @@
-from fastapi import FastAPI, BackgroundTasks, HTTPException
-import logging
-from scrapers.crawler_runner import CrawlerRunner
+from fastapi import FastAPI
+from scrapers.tasks import crawl_crypto_panic
+
+from app_config import get_settings
+
+
+settings = get_settings()
+
 
 app = FastAPI()
 
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"Hello": "world"}
 
 
 @app.post("/trigger-crawl/", response_model=dict[str, str])
-async def trigger_crawl(background_tasks: BackgroundTasks):
+async def trigger_crawl():
     """
     Endpoint to trigger the crypto_panic spider crawl
     """
-    try:
-        # Run the spider in the background
-        background_tasks.add_task(CrawlerRunner().run_spider)
-        return {"status": "accepted", "message": "Crawl started in background"}
-    except Exception as e:
-        logging.error(f"Failed to start crawl: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+    task = crawl_crypto_panic.delay()
+    return {"result": "task has started"}
