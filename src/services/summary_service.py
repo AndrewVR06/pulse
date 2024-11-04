@@ -2,7 +2,7 @@ import re
 
 import anthropic
 
-from config import get_settings
+from app_config import get_settings
 
 
 class SummaryService:
