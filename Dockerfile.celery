@@ -31,6 +31,9 @@ RUN poetry install --without dev
 
 COPY --chown=app:app src /backend
 
+ARG ENV_FILE=.env.production
+COPY ${ENV_FILE} .env
+
 USER app
 
 ENV PYTHONPATH="/backend"
