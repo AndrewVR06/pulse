@@ -17,6 +17,11 @@ class CeleryConfig(BaseSettings):
     broker_url: str
     result_backend: str
 
+    # Worker settings
+    worker_prefetch_multiplier: int = Field(default=1)
+    worker_max_tasks_per_child: int = Field(default=1)  # Die after one task
+    worker_concurrency: int = Field(default=1)  # Process one task at a time
+
     model_config = SettingsConfigDict(env_file=str(ENV_FILE), env_prefix="CELERY_", extra="ignore")
 
     def get_broker_url(self) -> str:
@@ -36,5 +41,11 @@ class CeleryConfig(BaseSettings):
         config = {
             "broker_url": self.get_broker_url(),
             "result_backend": self.get_result_backend_url(),
+            # Worker settings
+            "worker_prefetch_multiplier": self.worker_prefetch_multiplier,
+            "worker_max_tasks_per_child": self.worker_max_tasks_per_child,
+            # Logging settings
+            "worker_log_format": "[%(asctime)s: %(levelname)s/%(processName)s] %(message)s",
+            "worker_task_log_format": ("[%(asctime)s: %(levelname)s/%(processName)s] " "[%(task_name)s(%(task_id)s)] %(message)s"),
         }
         return config
