@@ -49,7 +49,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile.celery
-    command: ["poetry", "run", "celery", "-A", "celery_app", "worker", "--loglevel=info"]
+    command: ["poetry", "run", "celery", "-A", "celery_app", "worker", "--concurrency=1", "--loglevel=info"]
     depends_on:
       redis:
         condition: service_healthy

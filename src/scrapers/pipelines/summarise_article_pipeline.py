@@ -4,12 +4,12 @@ from database import SummarisedArticleModel
 from database.engine import DatabaseEngine
 from scrapers.schemas.index_article_input_schema import IndexArticleInputSchema
 from scrapers.schemas.summarise_article_input_schema import SummariseArticleInputSchema
-from services.summary_service import SummaryService
+from services.anthropic_service import AnthropicService
 
 
 class SummariseArticlePipeline:
     db_engine = DatabaseEngine()
-    summary_service = SummaryService()
+    summary_service = AnthropicService()
 
     async def process_item(self, item: SummariseArticleInputSchema, spider):
 

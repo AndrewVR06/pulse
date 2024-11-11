@@ -61,6 +61,7 @@ class CryptoPanic(scrapy.Spider):
         :return:
         """
         parsed_response = CryptoPanicApiResponse.model_validate(response.json())
+        print(f"Parsed response: {parsed_response}")
 
         yield from (
             scrapy.Request(
@@ -74,7 +75,7 @@ class CryptoPanic(scrapy.Spider):
                 },
                 callback=self.parse_crypto_panic_url,
             )
-            for rep in parsed_response.results[:1]
+            for rep in parsed_response.results
         )
 
     def parse_crypto_panic_url(self, response: TextResponse) -> None:

@@ -34,6 +34,9 @@ USER app
 
 ENV PYTHONPATH="/backend"
 
+ARG ENV_FILE=.env.production
+COPY ${ENV_FILE} .env
+
 EXPOSE 8080
 
 CMD ["/entrypoint.sh"]
