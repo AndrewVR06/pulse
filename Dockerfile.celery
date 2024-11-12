@@ -37,3 +37,5 @@ COPY ${ENV_FILE} .env
 USER app
 
 ENV PYTHONPATH="/backend"
+
+CMD ["poetry", "run", "celery", "-A", "celery_app", "worker", "--concurrency=1", "--loglevel=info"]
