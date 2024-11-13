@@ -31,11 +31,21 @@ RUN poetry install --without dev
 
 COPY --chown=app:app src /backend
 
-ARG ENV_FILE=.env.production
-COPY ${ENV_FILE} .env
-
 USER app
 
 ENV PYTHONPATH="/backend"
+
+ARG ENV_FILE
+COPY ${ENV_FILE} .env
+
+ARG PGSSLROOTCERT
+COPY --chown=app:app ${PGSSLROOTCERT} ./server_ca.crt
+
+ARG PGSSLCLIENTCERT
+COPY --chown=app:app ${PGSSLCLIENTCERT} ./client_cert.crt
+
+ARG PGSSLCLIENTKEY
+COPY --chown=app:app ${PGSSLCLIENTKEY} ./client_key.key
+
 
 CMD ["poetry", "run", "celery", "-A", "celery_app", "worker", "--concurrency=1", "--loglevel=info"]

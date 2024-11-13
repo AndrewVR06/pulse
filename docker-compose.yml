@@ -3,6 +3,11 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+      args:
+        ENV_FILE: src/.env
+        PGSSLROOTCERT: postgres_ssl/root.crt
+        PGSSLCLIENTCERT: postgres_ssl/client.crt
+        PGSSLCLIENTKEY: postgres_ssl/client.key
     develop:
       watch:
         - action: sync
@@ -25,10 +30,20 @@ services:
       - 5433:5432
     volumes:
       - ~/apps/postgres:/var/lib/postgresql/data
+      - ./postgres_ssl/server.crt:/etc/ssl/certs/server.crt:ro
+      - ./postgres_ssl/server.key:/etc/ssl/private/server.key:ro
+      - ./postgres_ssl/root.crt:/etc/ssl/certs/root.crt:ro
     environment:
       - POSTGRES_PASSWORD=password
       - POSTGRES_USER=postgres
       - POSTGRES_DB=pulse
+    command: >
+      postgres
+      -c ssl=on
+      -c ssl_cert_file=/etc/ssl/certs/server.crt
+      -c ssl_key_file=/etc/ssl/private/server.key
+      -c ssl_ca_file=/etc/ssl/certs/root.crt
+
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 2s
@@ -49,6 +64,8 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile.celery
+      args:
+        ENV_FILE: src/.env
     command: ["poetry", "run", "celery", "-A", "celery_app", "worker", "--concurrency=1", "--loglevel=info"]
     depends_on:
       redis:
