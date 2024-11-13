@@ -34,8 +34,17 @@ USER app
 
 ENV PYTHONPATH="/backend"
 
-ARG ENV_FILE=.env.production
+ARG ENV_FILE
 COPY ${ENV_FILE} .env
+
+ARG PGSSLROOTCERT
+COPY --chown=app:app ${PGSSLROOTCERT} ./server_ca.crt
+
+ARG PGSSLCLIENTCERT
+COPY --chown=app:app ${PGSSLCLIENTCERT} ./client_cert.crt
+
+ARG PGSSLCLIENTKEY
+COPY --chown=app:app ${PGSSLCLIENTKEY} ./client_key.key
 
 EXPOSE 8080
 

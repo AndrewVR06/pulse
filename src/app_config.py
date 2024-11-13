@@ -43,23 +43,20 @@ class AppSettings(BaseSettings):
 
     @property
     def ssl_database_context(self):
-        if self.ENVIRONMENT != "production":
-            return None
-
         # Define file paths for temporary files
-        server_ca_path = "/tmp/server_ca.pem"
-        client_cert_path = "/tmp/client_cert.pem"
-        client_key_path = "/tmp/client_key.pem"
+        server_ca_path = "./server_ca.crt"
+        client_cert_path = "./client_cert.crt"
+        client_key_path = "./client_key.key"
 
-        # Write the environment variable content to files with restricted permissions
-        def write_cert_file(path: str, content: str):
-            with open(path, "w") as f:
-                os.fchmod(f.fileno(), 0o600)  # Set permissions to -rw-------
-                f.write(content)
-
-        write_cert_file(server_ca_path, self.PGSSLROOTCERT_CONTENT)
-        write_cert_file(client_cert_path, self.PGSSLCERT_CONTENT)
-        write_cert_file(client_key_path, self.PGSSLKEY_CONTENT)
+        # # Write the environment variable content to files with restricted permissions
+        # def write_cert_file(path: str, content: str):
+        #     with open(path, "w") as f:
+        #         os.fchmod(f.fileno(), 0o600)  # Set permissions to -rw-------
+        #         f.write(content)
+        #
+        # write_cert_file(server_ca_path, self.PGSSLROOTCERT_CONTENT)
+        # write_cert_file(client_cert_path, self.PGSSLCERT_CONTENT)
+        # write_cert_file(client_key_path, self.PGSSLKEY_CONTENT)
 
         sslctx = ssl.create_default_context(ssl.Purpose.SERVER_AUTH, cafile=server_ca_path)
         sslctx.check_hostname = False
