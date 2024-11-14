@@ -52,10 +52,10 @@ class VectorService:
             )
         )
 
-    async def rerank_results(self, query: str, results: list[QueryResult]) -> list[RerankResult]:
+    async def rerank_results(self, query: str, results: list[QueryResult], k=32) -> list[RerankResult]:
 
         documents: list[str] = list(map(lambda doc: doc.content, results))
-        results: RerankingObject = await self._voyage_client.rerank(query, documents, model="rerank-2", top_k=32)
+        results: RerankingObject = await self._voyage_client.rerank(query, documents, model="rerank-2", top_k=k)
         return list(map(lambda result: RerankResult(index=result.index, content=result.document), results.results))
 
     def describe_index_stats(self):

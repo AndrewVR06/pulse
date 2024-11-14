@@ -33,10 +33,27 @@ async def post_question(question: Question):
     s = AnthropicService()
 
     time_cutoff = datetime.datetime.now() - datetime.timedelta(days=question.days_ago)
-    top_results = await v.retrieve_top_k_results(question.question, time_cutoff, k=64)
+    top_results = await v.retrieve_top_k_results(question.question, time_cutoff, k=256)
     reranked_results = await v.rerank_results(question.question, top_results)
 
-    # answer = await s.answer_question(question.question, reranked_results)
+    answer = await s.answer_question(question.question, reranked_results)
+
+    return {"answer": answer}
+
+
+@app.post("/predict/", response_model=dict[str, str])
+async def post_question():
+    v = VectorService()
+    s = AnthropicService()
+
+    question = """
+    What is the latest news on cryptocurrencies and their price movements? I only want news that could have a significant
+    impact on the market.
+    """
+
+    time_cutoff = datetime.datetime.now() - datetime.timedelta(days=10)
+    top_results = await v.retrieve_top_k_results(question, time_cutoff, k=256)
+    reranked_results = await v.rerank_results(question, top_results, k=64)
     answer = await s.predict(reranked_results)
 
     return {"answer": answer}
