@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-  # Manual trigger
   workflow_dispatch:
 
 env:

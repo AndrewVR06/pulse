@@ -1,9 +1,6 @@
 name: 'Build and Push Celery Image'
 
 on:
-  push:
-    branches:
-      - main
   # Manual trigger
   workflow_dispatch:
 
