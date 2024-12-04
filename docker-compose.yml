@@ -66,6 +66,9 @@ services:
       dockerfile: ./Dockerfile.celery
       args:
         ENV_FILE: src/.env
+        PGSSLROOTCERT: postgres_ssl/root.crt
+        PGSSLCLIENTCERT: postgres_ssl/client.crt
+        PGSSLCLIENTKEY: postgres_ssl/client.key
     command: ["poetry", "run", "celery", "-A", "celery_app", "worker", "--concurrency=1", "--loglevel=info"]
     depends_on:
       redis:

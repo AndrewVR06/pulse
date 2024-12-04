@@ -1,8 +1,11 @@
+import logging
 import re
+from typing import List
 
 import anthropic
 
 from app_config import get_settings
+from chatbot.schemas.user_session import PulsebotAnswer
 from schemas.rerank_result import RerankResult
 
 
@@ -13,6 +16,10 @@ class AnthropicService:
         if cls._instance is None:
             cls._instance = super(AnthropicService, cls).__new__(cls)
             cls._instance.client = anthropic.AsyncAnthropic(api_key=get_settings().ANTHROPIC_API_KEY)
+
+            cls._instance.logger = logging.getLogger("anthropic._base_client")
+            cls._instance.logger.setLevel(get_settings().LOG_LEVEL)
+
         return cls._instance
 
     async def isolate_article_text(self, article_text: str) -> str:
@@ -50,7 +57,7 @@ class AnthropicService:
         
         4. In cases where it's unclear whether certain text belongs to the article or is extraneous, err on the side of inclusion to avoid losing potentially important content.
         
-        Once you have extracted the article content, present it in the following format:
+        Always output the extracted article content in the following format:
         
         <extracted_article>
         [Insert the extracted article content here, preserving original formatting]
@@ -64,7 +71,6 @@ class AnthropicService:
                 {"role": "user", "content": prompt},
             ],
             temperature=0.1,
-            stop_sequences=["</extracted_article>"],
         )
 
         # Define a regex pattern to extract content between the <extracted_article> tags
@@ -103,7 +109,7 @@ class AnthropicService:
         Short-term vs. Long-term Effects: Immediate market reactions versus potential future implications (if mentioned)
         Technical Analysis Indicators (if mentioned)
         
-        Once you have summarised the article content, present it in the following format:
+        Always output the summarised article content in the following format:
         
         <summarised_article>
         [Insert the summarised article content here]
@@ -123,7 +129,6 @@ class AnthropicService:
             messages=[
                 {"role": "user", "content": prompt},
             ],
-            stop_sequences=["</summarised_article>"],
         )
 
         # Define a regex pattern to extract content between the <summarised_article> tags
@@ -134,34 +139,45 @@ class AnthropicService:
 
         return response.content[0].text
 
-    async def answer_question(self, question: str, results: list[RerankResult]) -> str:
+    @staticmethod
+    def create_initial_prompt(question: str, results: list[RerankResult]) -> str:
         context = "\n\n".join(f"<article>\n{r.content}\n</article>" for r in results)
 
-        prompt = f"""
-        Use the the below article list of financial context to answer the question. Each article in the list starts with 
+        return f"""
+        I will present you with a question. Your goal is to answer it accurately and concisely using only the information provided in the context above.
+        Every question will come with additional context to help you answer it. 
+        
+        The following is always true:
+        1. The question you need to answer is wrapped in tags <question> </question>
+        2. The context which you will use to answer the question is wrapped in tags <context> </context>
+        
+        The context that you will use to answer the question is a list of news articles. Each article in the list starts with 
         '<article>' and ends with '</article>'. This is important as the sentiment score of each article indicates the significance the article's content should
-        contribute to your answer. Here is the context:
+        contribute to your answer.
+        
+        Here is your question:
 
-        <context>
-        {context}
-        </context>
-        
-        Now, I will present you with a question. Your goal is to answer it accurately and concisely using only the information provided in the context above.
-        
         <question>
         {question}
         </question>
         
-        Instructions for answering:
+        And here is your context:
         
+        <context>
+        {context}
+        </context>
+
+        Instructions for answering:
+
         1. Carefully read and analyze the provided context and question.
         2. Formulate your answer using only the information given in the context. Do not introduce any external information or make assumptions beyond what is explicitly stated.
         3. Provide a clear and concise answer. Avoid unnecessary elaboration or speculation.
         4. If the question asks for a prediction, base your prediction solely on the trends and data provided in the context. Clearly state that it is a prediction based on the given information.
         5. If you cannot answer the question based on the provided context, state that the information is not available in the given context.
-        
-        Output your answer in the following format:
-        
+        6. Always use the opening tag <answer> to start your reply and always end with </answer>
+
+        An example of an answer is seen below:
+
         <answer>
         Your concise and clear answer here, based solely on the provided context.
         </answer>
@@ -169,6 +185,30 @@ class AnthropicService:
         Remember, accuracy and clarity are key. Do not hallucinate or include information not present in the given context.
         """
 
+    @staticmethod
+    def prepare_question(question: str, results: list[RerankResult]) -> str:
+        context = "\n\n".join(f"<article>\n{r.content}\n</article>" for r in results)
+
+        prepared_question = f"""
+        Here is your question:
+
+        <question>
+        {question}
+        </question>
+        
+        And here is your context:
+        
+        <context>
+        {context}
+        </context>
+        
+        Always remember to refer back to your list of instructions for answering questions!
+        """
+        return prepared_question
+
+    async def answer_question(self, question: str, results: list[RerankResult], messages: List[PulsebotAnswer] = None) -> str:
+
+        messages = [answer.model_dump() for answer in messages]
         response = await self.client.messages.create(
             model="claude-3-5-sonnet-20241022",
             max_tokens=8192,
@@ -178,11 +218,8 @@ class AnthropicService:
                     "text": "You are a financial analyst AI assistant. Your task is to answer questions based solely on the provided financial context. Do not use any external knowledge or make assumptions beyond what is explicitly stated in the context.",
                 },
             ],
-            temperature=0.2,
-            messages=[
-                {"role": "user", "content": prompt},
-            ],
-            stop_sequences=["</answer>"],
+            temperature=0.3,
+            messages=messages,
         )
 
         pattern = r"<answer>\s*(.*?)\s*</answer>"
@@ -226,6 +263,8 @@ class AnthropicService:
         
         Include confidence levels (Low/Medium/High) for each prediction.  Remember, accuracy and clarity are key. Do not hallucinate or include information not present in the given context.
         </instructions>
+        
+        Always output your answer in the following format:
 
         <answer>
         Your concise and clear answer here, based solely on the provided context.
@@ -245,7 +284,6 @@ class AnthropicService:
             messages=[
                 {"role": "user", "content": prompt},
             ],
-            stop_sequences=["</answer>"],
         )
 
         pattern = r"<answer>\s*(.*?)\s*</answer>"

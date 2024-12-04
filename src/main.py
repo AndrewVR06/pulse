@@ -1,4 +1,6 @@
 import datetime
+import logging
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -9,12 +11,26 @@ from scrapers.tasks import crawl_crypto_panic
 
 from app_config import get_settings
 from services.anthropic_service import AnthropicService
+from services.redis_service import RedisService
 from services.vector_service import VectorService
+from routers.chatbot_router import chatbot_router
 
 settings = get_settings()
+logging.basicConfig(level=logging.DEBUG, format="%(name)s - %(levelname)s - %(message)s")
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+
+    redis_service = RedisService()
+    await redis_service.init_redis()
+
+    yield
+    await redis_service.close_redis()
+
+
+app = FastAPI(lifespan=lifespan)
+app.include_router(chatbot_router)
 
 
 class Question(BaseModel):
