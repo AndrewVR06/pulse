@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import logging
 
 from pinecone.grpc import PineconeGRPC as Pinecone
 import voyageai
@@ -9,7 +10,6 @@ from app_config import get_settings
 from schemas.document import Document
 from schemas.query_result import QueryResult
 from schemas.rerank_result import RerankResult
-from services.anthropic_service import AnthropicService
 
 
 class VectorService:
@@ -22,6 +22,10 @@ class VectorService:
             cls._instance._pinecone_client = Pinecone(api_key=get_settings().PINECONE_API_KEY)
             cls._instance._index = cls._instance._pinecone_client.Index("voyage-finance-production")
             cls._instance._voyage_client = voyageai.AsyncClient(api_key=get_settings().VOYAGEAI_API_KEY)
+
+            voyage_logger = logging.getLogger("voyage")
+            voyage_logger.setLevel(get_settings().LOG_LEVEL)
+
         return cls._instance
 
     async def store_document(self, document: Document) -> None:
