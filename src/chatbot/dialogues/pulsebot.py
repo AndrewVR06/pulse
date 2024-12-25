@@ -29,7 +29,7 @@ class PulseBot(BaseDialogue):
             return dedent(self.base_content)
 
         question = self._context.body
-        time_cutoff = datetime.datetime.now() - datetime.timedelta(days=20)
+        time_cutoff = datetime.datetime.now() - datetime.timedelta(days=3)
         top_results = await self._vector_service.retrieve_top_k_results(question, time_cutoff, k=128)
         reranked_results = await self._vector_service.rerank_results(question, top_results)
 
