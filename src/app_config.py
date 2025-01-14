@@ -40,6 +40,11 @@ class AppSettings(BaseSettings):
     VOYAGEAI_API_KEY: str
     CRYPTO_PANIC_API_KEY: str
 
+    # Twilio Keys
+    TWILIO_ACCOUNT_SID: str
+    TWILIO_AUTH_TOKEN: str
+    TWILIO_PHONE_NUMBER: str
+
     model_config = SettingsConfigDict(env_file=str(ENV_FILE), extra="ignore")
 
     @cached_property
