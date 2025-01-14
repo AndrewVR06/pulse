@@ -8,15 +8,14 @@ from chatbot.dialogues.wrong_option import WrongOption
 
 
 class MainMenu(BaseDialogue):
-    _instance = None
 
     async def get_response(self) -> str:
         content = f"""
         Hi {self._context.profile_name} and welcome to MetisAI!
-        
+
         Here you can chat with our chatbot PulseBot as well as get a high level overview of what's currently happening
-        in the crypto market. 
-        
+        in the crypto market.
+
         What would you like to do?
         1. Chat with PulseBot.
         2. Get a general overview.
@@ -30,4 +29,4 @@ class MainMenu(BaseDialogue):
         elif answer == "2":
             return Overview(self._context)
         else:
-            return WrongOption()
+            return WrongOption(self._context)

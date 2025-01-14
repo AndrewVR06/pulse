@@ -1,5 +1,6 @@
 from chatbot.schemas.twilio_message import TwilioMessage
 from services.redis_service import RedisService
+from fastapi.background import BackgroundTasks
 
 
 class BaseDialogue:
