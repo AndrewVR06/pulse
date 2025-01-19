@@ -20,7 +20,7 @@ class VectorService:
         if cls._instance is None:
             cls._instance = super(VectorService, cls).__new__(cls)
             cls._instance._pinecone_client = Pinecone(api_key=get_settings().PINECONE_API_KEY)
-            cls._instance._index = cls._instance._pinecone_client.Index("voyage-finance-production")
+            cls._instance._index = cls._instance._pinecone_client.Index(get_settings().VECTOR_STORE_NAME)
             cls._instance._voyage_client = voyageai.AsyncClient(api_key=get_settings().VOYAGEAI_API_KEY)
 
             voyage_logger = logging.getLogger("voyage")

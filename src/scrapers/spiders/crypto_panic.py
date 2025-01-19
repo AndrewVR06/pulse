@@ -52,7 +52,18 @@ class CryptoPanic(scrapy.Spider):
         will need to navigate through there to get the sites of interest.
         """
         api = f"https://cryptopanic.com/api/v1/posts/?auth_token={get_settings().CRYPTO_PANIC_API_KEY}&public=true&kind=news&page=1"
-        yield scrapy.Request(url=api, callback=self.parse_api_response)
+        yield scrapy.Request(
+            url=api,
+            headers={
+                "User-Agent": UserAgent().random,
+                "Host": "cryptopanic.com",
+                "Accept": "application/json",
+                "Accept-Language": "en-US,en;q=0.9",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Cache-Control": "no-cache",
+            },
+            callback=self.parse_api_response,
+        )
 
     def parse_api_response(self, response: TextResponse) -> None:
         """
@@ -65,10 +76,20 @@ class CryptoPanic(scrapy.Spider):
         yield from (
             scrapy.Request(
                 str(rep.url),
+                headers={
+                    "User-Agent": response.request.headers["User-Agent"],
+                    "Accept-Language": "en-US,en;q=0.9",
+                    "Accept-Encoding": "gzip, deflate, br",
+                    "Cookie": "; ".join(response.headers.getlist(b"Set-Cookie")),  # Maintain session
+                    "Origin": "https://cryptopanic.com",
+                    "Connection": "keep-alive",
+                    "Cache-Control": "no-cache",
+                },
                 meta={
                     "playwright": True,
                     "playwright_page_methods": [
-                        PageMethod("wait_for_selector", selector=".post-header", state="visible", timeout=5000),
+                        PageMethod("wait_for_selector", selector="#detail_pane", state="attached", timeout=5000),
+                        PageMethod("wait_for_selector", selector=".post-header", state="attached", timeout=5000),
                     ],
                     "cryptopanic_response": rep,
                 },

@@ -17,12 +17,16 @@ class AppSettings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     ENVIRONMENT: str = "local"
 
+    # Pinecone vector store
+    VECTOR_STORE_NAME: str = "voyage-finance-production"
+
     # Database settings
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_HOST: str
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str
+    SSL_ENABLED: bool = True
 
     PGSSLROOTCERT_CONTENT: str | None = None
     PGSSLCERT_CONTENT: str | None = None
@@ -57,6 +61,9 @@ class AppSettings(BaseSettings):
     @cached_property
     def ssl_database_context(self):
         # Define file paths for temporary files
+        if not self.SSL_ENABLED:
+            return None
+
         server_ca_path = "./server_ca.crt"
         client_cert_path = "./client_cert.crt"
         client_key_path = "./client_key.key"
