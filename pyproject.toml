@@ -24,6 +24,7 @@ asyncpg = "^0.30.0"
 celery = {extras = ["redis"], version = "^5.4.0"}
 twilio = "^9.3.7"
 redis = "^5.2.0"
+scrapy-rotating-proxies = "^0.6.2"
 
 
 [tool.poetry.group.dev.dependencies]
