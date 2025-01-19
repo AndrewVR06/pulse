@@ -30,7 +30,11 @@ class CryptoPanic(scrapy.Spider):
     name = "crypto_panic"
     custom_settings = {
         "PLAYWRIGHT_ABORT_REQUEST": should_abort_request,
-        "PLAYWRIGHT_LAUNCH_OPTIONS": {"headless": True, "timeout": 20 * 1000},
+        "PLAYWRIGHT_LAUNCH_OPTIONS": {
+            "headless": True,
+            "timeout": 20 * 1000,
+            "proxy": None,
+        },
         "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
         "DOWNLOAD_HANDLERS": {
             "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
@@ -56,7 +60,6 @@ class CryptoPanic(scrapy.Spider):
             url=api,
             headers={
                 "User-Agent": UserAgent().random,
-                "Host": "cryptopanic.com",
                 "Accept": "application/json",
                 "Accept-Language": "en-US,en;q=0.9",
                 "Accept-Encoding": "gzip, deflate, br",
@@ -72,7 +75,6 @@ class CryptoPanic(scrapy.Spider):
         :return:
         """
         parsed_response = CryptoPanicApiResponse.model_validate(response.json())
-
         yield from (
             scrapy.Request(
                 str(rep.url),
@@ -81,7 +83,6 @@ class CryptoPanic(scrapy.Spider):
                     "Accept-Language": "en-US,en;q=0.9",
                     "Accept-Encoding": "gzip, deflate, br",
                     "Cookie": "; ".join(response.headers.getlist(b"Set-Cookie")),  # Maintain session
-                    "Origin": "https://cryptopanic.com",
                     "Connection": "keep-alive",
                     "Cache-Control": "no-cache",
                 },
@@ -92,10 +93,12 @@ class CryptoPanic(scrapy.Spider):
                         PageMethod("wait_for_selector", selector=".post-header", state="attached", timeout=5000),
                     ],
                     "cryptopanic_response": rep,
+                    "proxy": response.meta.get("proxy"),
+                    "dont_retry": False,
                 },
                 callback=self.parse_crypto_panic_url,
             )
-            for rep in parsed_response.results
+            for rep in parsed_response.results[:1]
         )
 
     def parse_crypto_panic_url(self, response: TextResponse) -> None:
@@ -112,6 +115,7 @@ class CryptoPanic(scrapy.Spider):
             cookies={cookie.split(b"=")[0].decode(): cookie.split(b"=")[1].decode() for cookie in cookies},
             meta={
                 "playwright": True,
+                "proxy": response.meta.get("proxy"),
                 "playwright_page_methods": [
                     PageMethod("wait_for_timeout", timeout=3000),
                 ],
