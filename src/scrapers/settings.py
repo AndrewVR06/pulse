@@ -91,8 +91,9 @@ RETRY_TIMES = 3
 # Retry on most error codes since proxies fail for different reasons
 RETRY_HTTP_CODES = [500, 503, 504, 400, 403, 404, 408]
 
+ROTATING_PROXY_LIST_PATH = f"{os.path.dirname(os.path.abspath(__file__))}/proxies.txt"
+
 DOWNLOADER_MIDDLEWARES = {
     "rotating_proxies.middlewares.RotatingProxyMiddleware": 350,
+    "rotating_proxies.middlewares.BanDetectionMiddleware": 351,
 }
-
-ROTATING_PROXY_LIST_PATH = f"{os.path.abspath('')}/proxies.txt"
